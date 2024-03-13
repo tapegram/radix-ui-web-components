@@ -11,6 +11,7 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
+    "@lit/context": "^1.1.0",
     "lit": "^3.1.2"
   },
   "devDependencies": {

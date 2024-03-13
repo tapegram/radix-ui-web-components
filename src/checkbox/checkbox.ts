@@ -1,3 +1,5 @@
+import { ContextConsumer } from "@lit/context";
+import { ContextProvider, createContext } from "@lit/context";
 import { LitElement, css, html } from "lit";
 import { customElement, property } from "lit/decorators.js";
 
@@ -6,6 +8,15 @@ import { customElement, property } from "lit/decorators.js";
  * Handle FormControl
  * Scaffold Indicator
  */
+
+export const checkboxContext = createContext<CheckboxContext>(
+  Symbol("checkbox-context"),
+);
+
+type CheckboxContext = {
+  state: CheckedState;
+  disabled: boolean;
+};
 
 @customElement("checkbox-root")
 export class CheckboxRoot extends LitElement {
@@ -20,6 +31,11 @@ export class CheckboxRoot extends LitElement {
 
   @property()
   disabled: boolean = false;
+
+  private _provider = new ContextProvider(this, {
+    context: checkboxContext,
+    initialValue: { state: getState(this._checked), disabled: this.disabled },
+  });
 
   render() {
     return html`<div>
@@ -47,15 +63,23 @@ declare global {
 
 @customElement("checkbox-indicator")
 export class CheckboxIndicator extends LitElement {
+  private _checkboxState = new ContextConsumer(this, {
+    context: checkboxContext,
+  });
   render() {
+    const data = this._checkboxState.value!;
     return html`<div>
-      <span
-        data-state=${getState(true)} // todo
-        data-disabled=false
-        style="pointerEvents: 'none'"
-      >
-        <slot></slot>
-      </span>
+      ${isIndeterminate(data.state) || data.state === true
+        ? html`
+            <span
+              data-state=${data.state}
+              data-disabled=${data.disabled}
+              style="pointerEvents: 'none'"
+            >
+              <slot></slot>
+            </span>
+          `
+        : html``}
     </div> `;
   }
 }
