@@ -34,7 +34,7 @@ export class CheckboxRoot extends LitElement {
 
   private _provider = new ContextProvider(this, {
     context: checkboxContext,
-    initialValue: { state: getState(this._checked), disabled: this.disabled },
+    initialValue: { state: this._checked, disabled: this.disabled },
   });
 
   render() {
