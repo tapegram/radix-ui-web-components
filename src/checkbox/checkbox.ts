@@ -88,7 +88,7 @@ export class CheckboxIndicator extends LitElement {
     console.log(data);
     console.log(isIndeterminate(data.state));
     console.log(data.state);
-    return html`<div>
+    return html`
       ${isIndeterminate(this._checkboxState!.state) ||
       this._checkboxState!.state === true
         ? html`
@@ -101,7 +101,7 @@ export class CheckboxIndicator extends LitElement {
             </span>
           `
         : nothing}
-    </div> `;
+    `;
   }
 }
 
