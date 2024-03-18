@@ -1,6 +1,6 @@
-import { ContextConsumer } from "@lit/context";
-import { ContextProvider, createContext } from "@lit/context";
-import { LitElement, css, html } from "lit";
+import { consume, provide } from "@lit/context";
+import { createContext } from "@lit/context";
+import { LitElement, html, nothing } from "lit";
 import { customElement, property } from "lit/decorators.js";
 
 /*
@@ -32,26 +32,42 @@ export class CheckboxRoot extends LitElement {
   @property()
   disabled: boolean = false;
 
-  private _provider = new ContextProvider(this, {
-    context: checkboxContext,
-    initialValue: { state: this._checked, disabled: this.disabled },
-  });
+  @provide({ context: checkboxContext })
+  @property()
+  _context: CheckboxContext = {
+    state: this._checked,
+    disabled: this.disabled,
+  };
 
   render() {
-    return html`<div>
+    console.log("Logging root");
+    return html`
       <button
         type="button"
         role="checkbox"
-        aria-checked=${isIndeterminate(this._checked) ? "mixed" : this._checked}
-        aria-required=${this.required}
-        data-state=${getState(this._checked)}
-        data-disabled=${this.disabled ? "" : undefined}
-        disabled=${this.disabled}
-        value=${this.value}
+        @click="${this.handleClick}"
+        aria-checked="${isIndeterminate(this._checked)
+          ? "mixed"
+          : this._checked}"
+        aria-required="${this.required}"
+        data-state="${getState(this._checked)}"
+        data-disabled="${this.disabled ? "" : undefined}"
+        disabled="${this.disabled || nothing}"
+        value="${this.value}"
       >
         <slot></slot>
       </button>
-    </div> `;
+    `;
+  }
+
+  private handleClick(_e: Event) {
+    console.log("handleClick");
+    this._checked = !!!this._checked;
+    console.log(this._context);
+    this._context = { state: this._checked, disabled: this.disabled };
+    console.log(this._checked);
+    console.log(this.disabled);
+    console.log("/handleClick");
   }
 }
 
@@ -63,24 +79,35 @@ declare global {
 
 @customElement("checkbox-indicator")
 export class CheckboxIndicator extends LitElement {
-  private _checkboxState = new ContextConsumer(this, {
-    context: checkboxContext,
-  });
+  @consume({ context: checkboxContext, subscribe: true })
+  _checkboxState?: CheckboxContext;
+
   render() {
-    const data = this._checkboxState.value!;
+    console.log("render checkbox indicator");
+    const data = this._checkboxState!;
+    console.log(data);
+    console.log(isIndeterminate(data.state));
+    console.log(data.state);
     return html`<div>
-      ${isIndeterminate(data.state) || data.state === true
+      ${isIndeterminate(this._checkboxState!.state) ||
+      this._checkboxState!.state === true
         ? html`
             <span
-              data-state=${data.state}
-              data-disabled=${data.disabled}
+              data-state=${this._checkboxState!.state}
+              data-disabled=${this._checkboxState!.disabled}
               style="pointerEvents: 'none'"
             >
               <slot></slot>
             </span>
           `
-        : html``}
+        : nothing}
     </div> `;
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "checkbox-indicator": CheckboxIndicator;
   }
 }
 
