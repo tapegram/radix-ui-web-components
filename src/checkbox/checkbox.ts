@@ -2,12 +2,7 @@ import { consume, provide } from "@lit/context";
 import { createContext } from "@lit/context";
 import { LitElement, html, nothing } from "lit";
 import { customElement, property } from "lit/decorators.js";
-
-/*
- * Scaffold Checkbox
- * Handle FormControl
- * Scaffold Indicator
- */
+import { addGlobalCSSStyleSheets } from "../global-stylesheet-helper";
 
 export const checkboxContext = createContext<CheckboxContext>(
   Symbol("checkbox-context"),
@@ -18,13 +13,20 @@ type CheckboxContext = {
   disabled: boolean;
 };
 
-@customElement("checkbox-root")
 export class CheckboxRoot extends LitElement {
-  @property()
-  _checked: CheckedState = false;
+  static register() {
+    addGlobalCSSStyleSheets(CheckboxRoot);
+    customElements.define("checkbox-root", CheckboxRoot);
+  }
 
   @property()
   required: boolean | null = false;
+
+  @property()
+  defaultChecked: boolean | null = false;
+
+  @property()
+  _checked: CheckedState = this.defaultChecked || "indeterminate";
 
   @property()
   value: string = "on";
@@ -77,8 +79,12 @@ declare global {
   }
 }
 
-@customElement("checkbox-indicator")
 export class CheckboxIndicator extends LitElement {
+  static register() {
+    addGlobalCSSStyleSheets(CheckboxIndicator);
+    customElements.define("checkbox-indicator", CheckboxIndicator);
+  }
+
   @consume({ context: checkboxContext, subscribe: true })
   _checkboxState?: CheckboxContext;
 
