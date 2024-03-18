@@ -25,6 +25,11 @@ button {
 
 .CheckboxIndicator {
   color: var(--violet-11);
+  height: 25px;
+  width: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .Label {
