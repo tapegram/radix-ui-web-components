@@ -13,6 +13,8 @@ type CheckboxContext = {
   disabled: boolean;
 };
 
+type CheckedState = boolean | "indeterminate";
+
 export class CheckboxRoot extends LitElement {
   static register() {
     addGlobalCSSStyleSheets(CheckboxRoot);
@@ -32,6 +34,9 @@ export class CheckboxRoot extends LitElement {
   value: string = "on";
 
   @property()
+  name: string | null = null;
+
+  @property()
   disabled: boolean = false;
 
   @provide({ context: checkboxContext })
@@ -47,9 +52,9 @@ export class CheckboxRoot extends LitElement {
         type="button"
         role="checkbox"
         @click="${this.handleClick}"
-        aria-checked="${isIndeterminate(this._checked)
-          ? "mixed"
-          : this._checked}"
+        aria-checked="${
+          isIndeterminate(this._checked) ? "mixed" : this._checked
+        }"
         aria-required="${this.required}"
         data-state="${getState(this._checked)}"
         data-disabled="${this.disabled ? "" : undefined}"
@@ -58,6 +63,17 @@ export class CheckboxRoot extends LitElement {
       >
         <slot></slot>
       </button>
+      <bubble-input 
+        name=${this.name || nothing}
+        value=${this.value || nothing}
+        checked=${this._checked}
+        required=${this.required || nothing}
+        disabled=${this.disabled || nothing}
+        // We transform because the input is absolutely positioned but we have
+        // rendered it **after** the button. This pulls it back to sit on top
+        // of the button.
+        style={{ transform: 'translateX(-100%)' }}
+      />
     `;
   }
 
@@ -106,7 +122,34 @@ declare global {
   }
 }
 
-type CheckedState = boolean | "indeterminate";
+export class BubbleInput extends LitElement {
+  static register() {
+    addGlobalCSSStyleSheets(BubbleInput);
+    customElements.define("bubble-input", BubbleInput);
+  }
+
+  @property()
+  checked: CheckedState = false;
+
+  render() {
+    return html`
+      <input
+        type="checkbox"
+        aria-hidden
+        defaultChecked=${isIndeterminate(this.checked) ? false : this.checked}
+        tabIndex={-1}
+        style={{
+          ...this.style,
+          position: 'absolute',
+          pointerEvents: 'none',
+          opacity: 0,
+          margin: 0,
+        }}
+      />
+    `;
+  }
+}
+
 function isIndeterminate(checked: CheckedState): checked is "indeterminate" {
   return checked === "indeterminate";
 }
