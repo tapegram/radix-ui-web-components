@@ -1,7 +1,7 @@
 import { consume, provide } from "@lit/context";
 import { createContext } from "@lit/context";
 import { LitElement, html, nothing } from "lit";
-import { customElement, property } from "lit/decorators.js";
+import { property } from "lit/decorators.js";
 import { addGlobalCSSStyleSheets } from "../global-stylesheet-helper";
 
 export const checkboxContext = createContext<CheckboxContext>(
@@ -42,7 +42,6 @@ export class CheckboxRoot extends LitElement {
   };
 
   render() {
-    console.log("Logging root");
     return html`
       <button
         type="button"
@@ -63,13 +62,8 @@ export class CheckboxRoot extends LitElement {
   }
 
   private handleClick(_e: Event) {
-    console.log("handleClick");
     this._checked = !!!this._checked;
-    console.log(this._context);
     this._context = { state: this._checked, disabled: this.disabled };
-    console.log(this._checked);
-    console.log(this.disabled);
-    console.log("/handleClick");
   }
 }
 
@@ -89,11 +83,6 @@ export class CheckboxIndicator extends LitElement {
   _checkboxState?: CheckboxContext;
 
   render() {
-    console.log("render checkbox indicator");
-    const data = this._checkboxState!;
-    console.log(data);
-    console.log(isIndeterminate(data.state));
-    console.log(data.state);
     return html`
       ${isIndeterminate(this._checkboxState!.state) ||
       this._checkboxState!.state === true
