@@ -16,3 +16,13 @@ After some trial and error, I'm going with using [Lit](https://lit.dev/docs/) as
 - [Vite](https://vitejs.dev/)
 - [Lit](https://lit.dev/)
 - [Storybook](https://storybook.js.org/)
+
+## Notes
+
+### Dialog
+
+https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog
+
+### Toasters
+
+Some toaster discussions https://discord.com/channels/1012791295170859069/1148353983610638417/1148694902515978260
